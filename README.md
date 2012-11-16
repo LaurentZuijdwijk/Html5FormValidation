@@ -29,6 +29,7 @@ Support for the following attributes is added.
 
 * required
 * pattern
+* placeholder
 
 How to use
 ----------
@@ -36,6 +37,16 @@ How to use
 To use the jQuery plugin, simply add the following code on page load:
 
 	$('form').html5form();
+
+The following CSS can be used to style yor form elements
+
+	input.invalid, textarea.invalid, select.invalid{
+		border:1px solid red
+	}
+	input.placeholder{
+		color:#ccc
+	}
+
 
 Requirements
 ------------
