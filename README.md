@@ -38,7 +38,7 @@ To use the jQuery plugin, simply add the following code on page load:
 
 	$('form').html5form();
 
-The following CSS can be used to style yor form elements
+Add invalid and placeholder classes to your CSS to give your user feedback on what is happening. Find an example below.
 
 	input.invalid, textarea.invalid, select.invalid{
 		border:1px solid red
@@ -46,6 +46,10 @@ The following CSS can be used to style yor form elements
 	input.placeholder{
 		color:#ccc
 	}
+
+If there are errors in the form, the form will not submit. If you want to give your users additional feedback, just listen to the error handler on your form.
+
+	$('form').html5form().bind('error', function(e){});
 
 
 Requirements
