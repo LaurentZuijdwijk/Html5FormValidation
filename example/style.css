@@ -1,0 +1,7 @@
+input.placeholder{
+	color:#ccc;
+}
+
+input.invalid{
+	border:1px solid red;
+}
