@@ -31,14 +31,14 @@
       };
 
       FormPlaceholderDecorator.prototype.focus = function(e) {
-        if (this.textFormField.$element.val() === this.placeholder()) {
+        if (this.textFormField.$element.originalVal() === this.placeholder()) {
           this.textFormField.element.value = '';
           return this.textFormField.$element.removeClass('placeholder');
         }
       };
 
       FormPlaceholderDecorator.prototype.blur = function() {
-        if (this.textFormField.$element.val() === '') {
+        if (this.textFormField.$element.originalVal() === '') {
           this.textFormField.element.value = this.placeholder();
           return this.textFormField.$element.addClass('placeholder');
         }
@@ -73,7 +73,6 @@
 
       FormField.prototype.fieldErrorEvent = function() {
         var feevent;
-        console.log(this);
         feevent = jQuery.Event("fieldError");
         feevent.field = this.$element;
         return this.$form.trigger(feevent);
@@ -100,12 +99,13 @@
 
         this.focus = __bind(this.focus, this);
 
-        TextFormField.__super__.constructor.call(this, this.element, this.form);
-        this.$element.bind('focus', this.focus);
-        this.$element.bind('blur', this.blur);
+        this.$element = $(this.element);
         if (this.$element.attr('placeholder')) {
           new HTML5Form.FormPlaceholderDecorator(this);
         }
+        this.$element.bind('focus', this.focus);
+        this.$element.bind('blur', this.blur);
+        TextFormField.__super__.constructor.call(this, this.element, this.form);
       }
 
       TextFormField.prototype.focus = function(event) {
@@ -270,6 +270,22 @@
 
   }).call(this);
 
+  $.fn.originalVal = $.fn.val;
+
+  $.fn.val = function(val) {
+    var $this;
+    if (val) {
+      return $.fn.originalVal(val);
+    } else {
+      $this = $(this);
+      val = $this.originalVal();
+      if ($this.attr('placeholder') === val) {
+        val = '';
+      }
+      return val;
+    }
+  };
+
   $.fn.html5FormValidator = function() {
     var formFieldFactory, html5form;
     html5form = new HTML5Form();
@@ -326,7 +342,7 @@
           } else {
             event.preventDefault();
             feevent = jQuery.Event("formError");
-            feevent.errors = errors;
+            feevent.fields = errors;
             $form.trigger(feevent);
             return false;
           }

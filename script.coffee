@@ -11,11 +11,11 @@ class HTML5Form
 		placeholder : ->
 			@textFormField.$element.attr('placeholder')
 		focus : (e) =>
-			if @textFormField.$element.val() == @placeholder()
+			if @textFormField.$element.originalVal() == @placeholder()
 				@textFormField.element.value = ''
 				@textFormField.$element.removeClass('placeholder')
 		blur : () =>
-			if @textFormField.$element.val() == ''
+			if @textFormField.$element.originalVal() == ''
 				@textFormField.element.value = @placeholder()
 				@textFormField.$element.addClass('placeholder')
 
@@ -30,7 +30,6 @@ class HTML5Form
 			if not validate then @$element.addClass 'invalid'
 			validate
 		fieldErrorEvent : ->
-			console.log this
 			feevent = jQuery.Event("fieldError");
 			feevent.field = @$element;
 			@$form.trigger(feevent);
@@ -41,10 +40,11 @@ class HTML5Form
 	@TextFormField = class TextFormField extends HTML5Form.FormField
 		pattern : null
 		constructor : (@element, @form) ->
-			super(@element, @form)
+			@$element = $(@element)
+			if @$element.attr('placeholder') then new HTML5Form.FormPlaceholderDecorator(@)
 			@$element.bind('focus', @focus)
 			@$element.bind('blur', @blur)
-			if @$element.attr('placeholder') then new HTML5Form.FormPlaceholderDecorator(@)
+			super(@element, @form)
 		focus : (event) => 
 			@$element.removeClass 'invalid'
 		blur  : (event) => 
@@ -100,8 +100,14 @@ class HTML5Form
 
 	@TextAreaFormField = class TextAreaFormField extends HTML5Form.TextFormField
 
-
-
+$.fn.originalVal = $.fn.val
+$.fn.val = (val) ->
+	if val then $.fn.originalVal(val)
+	else
+		$this = $(this)
+		val = $this.originalVal()
+		if $this.attr('placeholder') is val then val = ''
+		val
 
 
 $.fn.html5FormValidator = () ->
@@ -147,7 +153,7 @@ $.fn.html5FormValidator = () ->
 					else 
 						event.preventDefault()
 						feevent = jQuery.Event("formError");
-						feevent.errors = errors;
+						feevent.fields = errors;
 						$form.trigger(feevent);
 						false
 

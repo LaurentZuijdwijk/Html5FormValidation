@@ -1,53 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!---->
-  <!-- HTML5Form example by Laurent Zuijdwijk-->
-  <!---->
-  <!---->
-  <head>
-    <meta charset="utf-8">
-    <meta name="description" content="Form validation example">
-    <meta name="author" content="Laurent Zuijdwijk">
-    <link href="style.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script src="../script.js"></script>
-    <title>Demo</title>
-  </head>
-  <body>
-      <form method="post" action="/" novalidate>
-        <label for="name">Contact name *:</label><br>
-        <input type="text" maxlenght="12" pattern="[a-z]+" placeholder="name" required="required" name="name"><br>
-        <label for="email">Contact email address *:</label><br>
-        <input type="email"  required="required" autofocus name="email"><br>
-        <label for="phone">Contact phone number *:</label><br>
-        <input type="tel" name="phone"><br>
-        <select required>
-          <option value="">please select an option</option>
-          <option value="en">English</option>
-          <option value="fr">French</option>
-        </select> <br />
-        <input type="checkbox" required name="a" value="test" />afwe<br />
-        <input type="checkbox" required name="a" value="test" />afwe<br />
-        <input type="checkbox" required name="a" value="test" />afwe<br />
-        <textarea required ></textarea>
+	<!---->
+	<!-- HTML5Form example by Laurent Zuijdwijk-->
+	<!---->
+	<!---->
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="Form validation example">
+		<meta name="author" content="Laurent Zuijdwijk">
+		<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+		<link href="style.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="../script.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js" ></script>
+		<title>Demo</title>
+	</head>
+	<body>
+		<table>
+			<tr>
+				<td width="500">
+					<h3>Full example</h3>
+					<p>This exapmple will show an error box on the right of the form, containing the title text of the form elements that are invalid.</p>
+					<p>Please see the source code for the form markup.</p>
 
-        <input type="submit" value="Submit">
-      </form>
-      <script type="text/javascript">
-          var $form = $('form');
-          $form.html5FormValidator();
-          $form.bind('formError', function(e){
-            $(e.errors).each(function(){
-              console.log(this)
-              $(this).removeClass('invalid')
+				
+				</td>
+				<td>
+					<form id="example1" method="post" action="/" novalidate>
+						<label for="name">Contact name *:</label>
+						<input type="text" placeholder="name" autofocus required="required" name="name" title="Please enter your name">
+						<label for="email">Contact email address *:</label>
+						<input type="email" placeholder="email" required="required" title="Please enter your email address" name="email"><br>
+						<label for="phone">Contact phone number:</label>
+						<input type="tel" name="phone"><br>
+						<select name="language" title="Please select your language" required>
+							<option value="">please select an option</option>
+							<option value="en">English</option>
+							<option value="fr">French</option>
+						</select> <br />
+						<input type="checkbox" required name="a" value="o1" title="Please select an option" />Option 1<br />
+						<input type="checkbox" required name="a" value="o2" />Option 2<br />
+						<input type="checkbox" required name="a" value="o3" />Option 3<br />
+						<label for="message">Your Message *:</label>
+						
+						<textarea name="message" title="Please enter a message" required ></textarea>
+						<br />
+						<input class="btn" type="submit" value="Submit">
 
-            })
-          })
-          $form.bind('fieldError', function(e){
-            console.log(e)
-          })
- 
+					</form>
+				</td>
+				<td>
+					<div id="errors" class="alert alert-error hidden"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h3>Field errors with Bootstrap labels.</h3>
+					<pre class="prettyprint">
+&lt;input type="text" placeholder="name" required="required" name="name" data-placement="right" data-content="Please enter your name" data-original-title="Oops..."&gt;
+					</pre>	
+
+					<pre class="prettyprint">
+$form.bind('fieldError', function(e){
+	var $this = e.field
+	$this.popover('show')
+	$this.one('focus', function(){
+		$this.popover('destroy')
+	})
+})
+					</pre>	
+				</td>
+				<td>
+					<form id="example2" method="post" action="/" novalidate>
+						<label for="name">Contact name *:</label>
+						<input type="text" placeholder="name" required="required" name="name" data-placement="right" data-content="Please enter your name" data-original-title="Oops..."><br/>
+						<input type="submit" value="submit"/>
+					</form>
+				</td>
+			</tr>	
+		</table>	
+		<script type="text/javascript">
+			var $form = $('#example1');
+			$form.html5FormValidator();
+			$form.bind('formError', function(e){
+				console.log(e.fields)
+				$('#errors').html('')
+				var html = ''
+				$(e.fields).each(function(){
+					html += $(this).attr('title') + '<br />';
+				})
+				console.log(html)
+				$('#errors').html(html)
+				$('#errors').removeClass('hidden')
+				$('#errors').show('fast')
+			})
           
+			var $form = $('#example2');
+			$form.html5FormValidator();
+
+			$form.bind('fieldError', function(e){
+				var $this = e.field
+				$this.popover('show')
+				$this.one('focus', function(){
+					$this.popover('destroy')
+				})
+			})
+
+
       </script>
   </body>
 </html>
