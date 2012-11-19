@@ -8,7 +8,7 @@
   HTML5Form = (function() {
     "use strict";
 
-    var CheckboxFormField, EmailFormField, FormField, FormPlaceholderDecorator, SelectFormField, TelFormField, TextAreaFormField, TextFormField, UrlFormField;
+    var CheckboxFormField, DateFormField, EmailFormField, FormField, FormPlaceholderDecorator, NumberFormField, SelectFormField, TelFormField, TextAreaFormField, TextFormField, UrlFormField;
 
     function HTML5Form() {}
 
@@ -178,6 +178,65 @@
 
     })(HTML5Form.TextFormField);
 
+    HTML5Form.DateFormField = DateFormField = (function(_super) {
+
+      __extends(DateFormField, _super);
+
+      function DateFormField(element, form) {
+        var $newEl;
+        this.element = element;
+        this.form = form;
+        DateFormField.__super__.constructor.call(this, this.element, this.form);
+        if (this.$element.datepicker) {
+          $newEl = this.element.toString();
+          console.log($newEl);
+          this.$element.datepicker();
+        }
+      }
+
+      return DateFormField;
+
+    })(HTML5Form.TextFormField);
+
+    HTML5Form.NumberFormField = NumberFormField = (function(_super) {
+
+      __extends(NumberFormField, _super);
+
+      function NumberFormField(element, form) {
+        var max, min, step, value,
+          _this = this;
+        this.element = element;
+        this.form = form;
+        NumberFormField.__super__.constructor.call(this, this.element, this.form);
+        if (this.$element.slider) {
+          min = this.$element.attr('min') || 0;
+          max = this.$element.attr('max') || 10;
+          value = this.$element.attr('value') || min;
+          step = this.$element.attr('step') || 1;
+          this.element.value = value;
+          this.slider = $('<div class="slider" style="width:100px;display:inline-block"></div>');
+          this.res = $('<span class="res">' + value + '</span>');
+          this.$element.after(this.slider);
+          this.slider.after(this.res);
+          this.$element.hide();
+          this.slider.slider({
+            range: "min",
+            value: Number(value),
+            step: Number(step),
+            min: Number(min),
+            max: Number(max),
+            slide: function(event, ui) {
+              _this.element.value = Number(_this.slider.slider("value"));
+              return _this.res.text(_this.slider.slider("value"));
+            }
+          });
+        }
+      }
+
+      return NumberFormField;
+
+    })(HTML5Form.FormField);
+
     HTML5Form.SelectFormField = SelectFormField = (function(_super) {
 
       __extends(SelectFormField, _super);
@@ -295,6 +354,7 @@
       } else if (element.tagName.toUpperCase() === 'TEXTAREA') {
         return new HTML5Form.TextAreaFormField(element, form);
       } else {
+        console.log($(element).attr('type'));
         switch ($(element).attr('type')) {
           case 'email':
             return new HTML5Form.EmailFormField(element, form);
@@ -304,6 +364,10 @@
             return new HTML5Form.UrlFormField(element, form);
           case 'checkbox':
             return new HTML5Form.CheckboxFormField(element, form);
+          case 'date':
+            return new HTML5Form.DateFormField(element, form);
+          case 'number':
+            return new HTML5Form.NumberFormField(element, form);
           default:
             return new HTML5Form.TextFormField(element, form);
         }

@@ -68,6 +68,40 @@ class HTML5Form
 
 	@UrlFormField = class UrlFormField extends HTML5Form.TextFormField
 
+	@DateFormField = class DateFormField extends HTML5Form.TextFormField
+		constructor : (@element,@form) ->
+			super(@element, @form)
+			if @$element.datepicker
+				$newEl = @element.toString()
+
+				console.log $newEl 
+				@$element.datepicker()
+
+	@NumberFormField : class NumberFormField extends HTML5Form.FormField
+		constructor : (@element,@form) ->
+			super(@element, @form)
+			if @$element.slider
+				min = @$element.attr('min') || 0
+				max = @$element.attr('max') || 10
+				value = @$element.attr('value') || min
+				step = @$element.attr('step') || 1
+				@element.value = value
+				@slider = $ '<div class="slider" style="width:100px;display:inline-block"></div>'
+				@res = $ '<span class="res">'+value+'</span>'
+				@$element.after @slider
+				@slider.after @res
+				@$element.hide()
+				@slider.slider(
+					range: "min",
+					value: Number(value),
+					step: Number(step),
+					min: Number(min),
+					max: Number(max),
+					slide: (event, ui) => 
+						@element.value = Number(@slider.slider("value"))
+						@res.text @slider.slider("value")
+				)
+
 	@SelectFormField = class SelectFormField extends HTML5Form.FormField
 		constructor : (@element,@form) ->
 			super(@element, @form)
@@ -119,6 +153,7 @@ $.fn.html5FormValidator = () ->
 			else if element.tagName.toUpperCase() is 'TEXTAREA'
 				return new HTML5Form.TextAreaFormField(element, form)
 			else	
+				console.log $(element).attr('type')
 				switch $(element).attr('type')
 					when 'email' 
 						return new HTML5Form.EmailFormField(element, form)
@@ -127,7 +162,12 @@ $.fn.html5FormValidator = () ->
 					when 'url' 
 						return new HTML5Form.UrlFormField(element, form)
 					when 'checkbox' 
-						return new HTML5Form.CheckboxFormField(element, form)
+						return new HTML5Form.CheckboxFormField(element, form) 
+					when 'date' 
+						return new HTML5Form.DateFormField(element, form)
+					when 'number' 
+						return new HTML5Form.NumberFormField(element, form)
+
 					else
 						return new HTML5Form.TextFormField(element, form)
 		
