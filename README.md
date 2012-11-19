@@ -27,6 +27,9 @@ HTML5FormValidation supports the following input types:
 * input:url
 * input:tel
 * input:checkbox
+* input:date
+* input:number
+* input:range
 * textarea
 * select
 
@@ -35,6 +38,9 @@ The following attributes are supported:
 * required
 * pattern
 * placeholder
+* min (for number and range elements)
+* max (for number and range elements)
+* step (for number and range elements)
 
 Two event types are fired when a validation error occurs. A 'fieldError' on blur and a 'formError' on a failed submit. 
 
