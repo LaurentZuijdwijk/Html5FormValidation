@@ -1,11 +1,20 @@
 
 describe("FormField test", function() {
   var formField;
-    var textFormField, emailFormField, telFormField
+  var textFormField, emailFormField, telFormField
+  
   beforeEach(function() {
     formField = new HTML5Form.FormField();
     input = document.createElement('input')
     input.value = ''
+  });
+  it("jQuery val() test", function() {  
+    input.value = 'test'
+    expect($(input).val()).toBe('test')
+    expect($(input).originalVal()).toBe('test')
+    input.placeholder = 'test'
+    expect($(input).val()).toBe('')
+
   });
   it("Abstract class test", function() {
     expect(formField.validate()).not.toBeFalsy()

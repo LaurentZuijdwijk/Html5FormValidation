@@ -6,18 +6,21 @@ class HTML5Form
 		constructor : (@textFormField) ->
 			@textFormField.$element.bind 'blur', @blur
 			@textFormField.$element.bind 'focus', @focus
-			@textFormField.element.value = @placeholder()
-			@textFormField.$element.addClass('placeholder')
+			if not @textFormField.$element.val().length > 0
+				@textFormField.$element.val(@placeholder()) 
+				@textFormField.$element.addClass('placeholder')
 		placeholder : ->
-			@textFormField.$element.attr('placeholder')
+			@textFormField.$element.attr('placeholder')	
 		focus : (e) =>
-			if @textFormField.$element.originalVal() == @placeholder()
+			if @textFormField.element.value is @placeholder()
 				@textFormField.element.value = ''
-				@textFormField.$element.removeClass('placeholder')
+			@textFormField.$element.removeClass('placeholder')
+			true
 		blur : () =>
-			if @textFormField.$element.originalVal() == ''
+			if @textFormField.element.value == '' or @textFormField.element.value == @placeholder()
 				@textFormField.element.value = @placeholder()
 				@textFormField.$element.addClass('placeholder')
+			true
 
 	@FormField = class FormField
 		required : false
@@ -48,6 +51,7 @@ class HTML5Form
 		focus : (event) => 
 			@$element.removeClass 'invalid'
 		blur  : (event) => 
+			console.log 'valid',@_validate() 
 			if not @_validate() 
 				@fieldErrorEvent()
 				@$element.addClass 'invalid'
@@ -57,6 +61,7 @@ class HTML5Form
 			_return = true
 			if @pattern and @val.length > 0 and @val.search(@pattern) is -1 then _return = false
 			else if @$element.attr('required') and @val.length == 0 then _return = false
+			console.log @$element.attr('required'), @val.length
 			_return
 
 
@@ -70,15 +75,16 @@ class HTML5Form
 
 	@DateFormField = class DateFormField extends HTML5Form.TextFormField
 		constructor : (@element,@form) ->
-			super(@element, @form)
+			@$element = $(@element)
 			if @$element.datepicker
-				$newEl = @$element.clone()
+				$newEl = @$element.clone(true)
 				$newEl.attr('type', 'text')
 				@$element.after($newEl)
 				@$element.remove()
 				@$element = $newEl
 				@element = $newEl[0]
 				$newEl.datepicker()
+			super(@element, @form)
 
 	@NumberFormField : class NumberFormField extends HTML5Form.FormField
 		constructor : (@element,@form) ->
@@ -89,7 +95,7 @@ class HTML5Form
 				value = @$element.attr('value') || min
 				step = @$element.attr('step') || 1
 				@element.value = value
-				@slider = $ '<div class="slider" style="width:100px;display:inline-block"></div>'
+				@slider = $ '<div class="slider" style="display:inline-block"></div>'
 				@res = $ '<span class="res">'+value+'</span>'
 				@$element.after @slider
 				@slider.after @res
@@ -139,15 +145,18 @@ class HTML5Form
 
 $.fn.originalVal = $.fn.val
 $.fn.val = (val) ->
-	if val then $.fn.originalVal(val)
+	if val
+		$.fn.originalVal.call(this,val)
 	else
 		$this = $(this)
-		val = $this.originalVal()
-		if $this.attr('placeholder') is val then val = ''
+		val = $this.originalVal.call(this)
+		attr = $this.attr('placeholder')
+		
+		if not typeof attr is 'undefined' or not attr is false and attr is val then val = ''
 		val
 
 
-$.fn.html5FormValidator = () ->
+$.fn.html5FormValidator = () -> 
 	# Default settings
 		html5form = new HTML5Form()
 		formFieldFactory = (element, form) ->
@@ -156,7 +165,6 @@ $.fn.html5FormValidator = () ->
 			else if element.tagName.toUpperCase() is 'TEXTAREA'
 				return new HTML5Form.TextAreaFormField(element, form)
 			else	
-				console.log $(element).attr('type')
 				switch $(element).attr('type')
 					when 'email' 
 						return new HTML5Form.EmailFormField(element, form)
