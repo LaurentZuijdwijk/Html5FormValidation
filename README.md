@@ -70,10 +70,13 @@ If there are errors in the form, the form will not submit. If you want to give y
 Examples
 --------
 
+For a demo page visit http://laurentzuijdwijk.com/formvalidation/
+
 Have a look in the examples folder.
 
 Let's set up a simple example form.
 
+```html
 	<form method="post" action="/" novalidate>
 		<label for="name">Name:</label>
 		<input type="text" placeholder="Your name" name="name" required title="Please enter your name." />
@@ -86,8 +89,11 @@ Let's set up a simple example form.
 		<input type="submit" value="submit" />
 	</form>
 	<div id="errors"></div>
+```
+
 Simple initialization:
 
+```javascript
 	$('form').html5form();
 
 To display errors when they are encountered:
@@ -100,12 +106,12 @@ To display errors when they are encountered:
 		})
 		$('#errors').html(html)
 	})
-
+```
 
 Requirements
 ------------
 
-jQuery is currently required.
+jQuery is required. For range and date elements jQuery-ui is required.
 
 
 

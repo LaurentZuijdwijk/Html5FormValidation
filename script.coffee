@@ -72,10 +72,13 @@ class HTML5Form
 		constructor : (@element,@form) ->
 			super(@element, @form)
 			if @$element.datepicker
-				$newEl = @element.toString()
-
-				console.log $newEl 
-				@$element.datepicker()
+				$newEl = @$element.clone()
+				$newEl.attr('type', 'text')
+				@$element.after($newEl)
+				@$element.remove()
+				@$element = $newEl
+				@element = $newEl[0]
+				$newEl.datepicker()
 
 	@NumberFormField : class NumberFormField extends HTML5Form.FormField
 		constructor : (@element,@form) ->

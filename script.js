@@ -188,9 +188,13 @@
         this.form = form;
         DateFormField.__super__.constructor.call(this, this.element, this.form);
         if (this.$element.datepicker) {
-          $newEl = this.element.toString();
-          console.log($newEl);
-          this.$element.datepicker();
+          $newEl = this.$element.clone();
+          $newEl.attr('type', 'text');
+          this.$element.after($newEl);
+          this.$element.remove();
+          this.$element = $newEl;
+          this.element = $newEl[0];
+          $newEl.datepicker();
         }
       }
 
