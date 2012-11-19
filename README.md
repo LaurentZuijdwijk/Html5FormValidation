@@ -7,6 +7,11 @@ I aimed to make an easy to use form validation plugin, which will work in any br
 
 If you need a lightweight and unobtrusive plugin to make your forms behave, this might be good for you.
 
+API status
+----------
+
+Alpha. API's are likely to change.
+
 Test coverage
 -------------
 
