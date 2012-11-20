@@ -59,6 +59,7 @@ class HTML5Form
 			if @$element.attr('pattern') then @pattern = new RegExp(@$element.attr('pattern'))
 			@val = @$element.val()
 			_return = true
+			console.log @pattern, @val
 			if @pattern and @val.length > 0 and @val.search(@pattern) is -1 then _return = false
 			else if @$element.attr('required') and @val.length == 0 then _return = false
 			console.log @$element.attr('required'), @val.length
@@ -77,16 +78,39 @@ class HTML5Form
 		constructor : (@element,@form) ->
 			@$element = $(@element)
 			if @$element.datepicker
-				$newEl = @$element.clone(true)
-				$newEl.attr('type', 'text')
-				@$element.after($newEl)
-				@$element.remove()
-				@$element = $newEl
-				@element = $newEl[0]
-				$newEl.datepicker()
+				@$element.datepicker()
 			super(@element, @form)
 
-	@NumberFormField : class NumberFormField extends HTML5Form.FormField
+			
+	@NumberFormField : class NumberFormField extends HTML5Form.TextFormField
+		pattern : /^[-]?[0-9]*\.?[0-9]+$/
+		constructor : (@element,@form) ->
+			super(@element, @form)
+			@min = Number(@$element.attr('min')) || null
+			@max = Number(@$element.attr('max')) || null
+			@step = Number(@$element.attr('step')) || null
+			@$element.keydown @keydown
+			@$element.keyup @keydown
+		keydown : (e) =>
+			if e.keyCode is 32 then return false
+			if 7 < e.keyCode < 58 or e.keyCode is 190 or e.keyCode is 189 then return true
+			false
+		_validate : -> 
+			val = @$element.val()
+			if val is '' then return super()
+			val = Number(val)
+			if val is NaN then return false
+			if @step then val = val - (val % @step)
+			if @min and val < @min then val = @min
+			if @max and val > @max then val = @max
+			@element.value = val
+			
+			super()
+
+
+
+
+	@RangeFormField : class RangeFormField extends HTML5Form.FormField
 		constructor : (@element,@form) ->
 			super(@element, @form)
 			if @$element.slider
@@ -110,6 +134,7 @@ class HTML5Form
 						@element.value = Number(@slider.slider("value"))
 						@res.text @slider.slider("value")
 				)
+
 
 	@SelectFormField = class SelectFormField extends HTML5Form.FormField
 		constructor : (@element,@form) ->
@@ -176,9 +201,14 @@ $.fn.html5FormValidator = () ->
 						return new HTML5Form.CheckboxFormField(element, form) 
 					when 'date' 
 						return new HTML5Form.DateFormField(element, form)
+					when 'ui-date' 
+						return new HTML5Form.DateFormField(element, form)
 					when 'number' 
 						return new HTML5Form.NumberFormField(element, form)
-
+					when 'ui-number' 
+						return new HTML5Form.NumberFormField(element, form)
+					when 'range' 
+						return new HTML5Form.RangeFormField(element, form)
 					else
 						return new HTML5Form.TextFormField(element, form)
 		
