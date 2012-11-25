@@ -16,16 +16,16 @@
 		<title>Demo</title>
 	</head>
 	<body>
-		<table>
-			<tr>
-				<td width="500">
+		<div class="container">
+			<div class="row">
+				<div class="span6">
 					<h3>Full example</h3>
 					<p>This exapmple will show an error box on the right of the form, containing the title text of the form elements that are invalid.</p>
 					<p>Please see the source code for the form markup.</p>
-
-				
-				</td>
-				<td>
+				</div>
+			</div>
+			<div class="row">
+				<div class="span4">
 					<form id="example1" method="post" action="/" novalidate>
 						<label for="name">Contact name *:</label>
 						<input type="text" placeholder="name" autofocus required="required" name="name" title="Please enter your name">
@@ -46,16 +46,22 @@
 						<textarea name="message" title="Please enter a message" required ></textarea>
 						<br />
 						<input class="btn" type="submit" value="Submit">
-
 					</form>
-				</td>
-				<td>
-					<div id="errors" class="alert alert-error hidden"></div>
-				</td>
-			</tr>
-			<tr>
-				<td>
+				</div>
+				<div id="errors" class="alert alert-error hidden span4"></div>
+			</div>
+
+
+
+			<div class="row">
+				<div class="span12">
 					<h3>Field errors with Bootstrap labels.</h3>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="span6">
 					<pre class="prettyprint">
 &lt;input type="text" placeholder="name" required="required" name="name" data-placement="right" data-content="Please enter your name" data-original-title="Oops..."&gt;
 					</pre>	
@@ -69,16 +75,24 @@ $form.bind('fieldError', function(e){
 	})
 })
 					</pre>	
-				</td>
-				<td>
+				</div>
+				<div class="span4">
 					<form id="example2" method="post" action="/" novalidate>
 						<label for="name">Contact name *:</label>
 						<input type="text" placeholder="name" required="required" name="name" data-placement="right" data-content="Please enter your name" data-original-title="Oops..."><br/>
 						<input type="submit" value="submit"/>
 					</form>
-				</td>
-			</tr>	
-		</table>	
+				</div>
+			</div>
+
+
+
+
+
+		</div>
+
+
+
 		<script type="text/javascript">
 			var $form = $('#example1');
 			$form.html5FormValidator();
