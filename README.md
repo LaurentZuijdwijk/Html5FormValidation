@@ -51,7 +51,7 @@ How to use
 
 To use the jQuery plugin, simply add the following code on page load:
 
-	$('form').html5form();
+	$('form').html5FormValidator();
 
 Add invalid and placeholder classes to your CSS to give your user feedback on what is happening. Find an example below.
 
@@ -64,8 +64,8 @@ Add invalid and placeholder classes to your CSS to give your user feedback on wh
 
 If there are errors in the form, the form will not submit. If you want to give your users additional feedback, just listen to the error handler on your form.
 
-	$('form').html5form().bind('formError', function(e){});
-	$('form').html5form().bind('fieldError', function(e){});
+	$('form').html5FormValidator().bind('formError', function(e){});
+	$('form').html5FormValidator().bind('fieldError', function(e){});
 
 Examples
 --------
@@ -94,7 +94,7 @@ Let's set up a simple example form.
 Simple initialization:
 
 ```javascript
-	$('form').html5form();
+	$('form').html5FormValidator();
 
 To display errors when they are encountered:
 	

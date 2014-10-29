@@ -59,10 +59,10 @@ class HTML5Form
 			if @$element.attr('pattern') then @pattern = new RegExp(@$element.attr('pattern'))
 			@val = @$element.val()
 			_return = true
-			console.log @pattern, @val
+
 			if @pattern and @val.length > 0 and @val.search(@pattern) is -1 then _return = false
-			else if @$element.attr('required') and @val.length == 0 then _return = false
-			console.log @$element.attr('required'), @val.length
+			else if @$element.attr('required') and @val.replace(/(\s)/g,'').length == 0 then _return = false
+
 			_return
 
 
@@ -86,9 +86,10 @@ class HTML5Form
 		pattern : /^[-]?[0-9]*\.?[0-9]+$/
 		constructor : (@element,@form) ->
 			super(@element, @form)
-			@min = Number(@$element.attr('min')) || null
-			@max = Number(@$element.attr('max')) || null
-			@step = Number(@$element.attr('step')) || null
+			@min = Number(@$element.attr('min'))
+			
+			@max = Number(@$element.attr('max'))
+			@step = Number(@$element.attr('step'))
 			@$element.keydown @keydown
 			@$element.keyup @keydown
 		keydown : (e) =>
@@ -101,8 +102,8 @@ class HTML5Form
 			val = Number(val)
 			if val is NaN then return false
 			if @step then val = val - (val % @step)
-			if @min and val < @min then val = @min
-			if @max and val > @max then val = @max
+			if @min? and val < @min then return false
+			if @max? and val > @max then return false
 			@element.value = val
 			
 			super()
