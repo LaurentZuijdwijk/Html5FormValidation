@@ -27,6 +27,8 @@ class HTML5Form
 		constructor : (@element, @form) ->
 			@$form = $(form)
 			@$element = $(@element)
+
+			@$element.addClass('pristine')
 			if @$element.attr('autofocus') then @$element.focus();
 		validate : -> 
 			validate = @_validate()
@@ -49,9 +51,10 @@ class HTML5Form
 			@$element.bind('blur', @blur)
 			super(@element, @form)
 		focus : (event) => 
+			@$element.removeClass('pristine')
 			@$element.removeClass 'invalid'
 		blur  : (event) => 
-			console.log 'valid',@_validate() 
+
 			if not @_validate() 
 				@fieldErrorEvent()
 				@$element.addClass 'invalid'
@@ -142,9 +145,13 @@ class HTML5Form
 			super(@element, @form)
 			@$element.bind('focus', @focus)
 			@$element.bind('blur', @blur)
+			@$element.bind('change', @change)
+
 		focus : (event) => 
 			@$element.removeClass 'invalid'
+			@$element.removeClass 'pristine'
 		blur  : (event) => 
+		change  : (event) => 
 			if not @_validate() 
 				@fieldErrorEvent()
 				@$element.addClass 'invalid'
@@ -172,6 +179,8 @@ class HTML5Form
 $.fn.originalVal = $.fn.val
 $.fn.val = (val) ->
 	if val
+		$(this).removeClass('pristine')
+
 		$.fn.originalVal.call(this,val)
 	else
 		$this = $(this)
@@ -182,37 +191,44 @@ $.fn.val = (val) ->
 		val
 
 
+formFieldFactory = (element, form) ->
+	if element.tagName.toUpperCase() is 'SELECT'
+		return new HTML5Form.SelectFormField(element, form)
+	else if element.tagName.toUpperCase() is 'TEXTAREA'
+		return new HTML5Form.TextAreaFormField(element, form)
+	else	
+		switch $(element).attr('type')
+			when 'email' 
+				return new HTML5Form.EmailFormField(element, form)
+			when 'tel' 
+				return new HTML5Form.TelFormField(element, form)
+			when 'url' 
+				return new HTML5Form.UrlFormField(element, form)
+			when 'checkbox' 
+				return new HTML5Form.CheckboxFormField(element, form) 
+			when 'date' 
+				return new HTML5Form.DateFormField(element, form)
+			when 'ui-date' 
+				return new HTML5Form.DateFormField(element, form)
+			when 'number' 
+				return new HTML5Form.NumberFormField(element, form)
+			when 'ui-number' 
+				return new HTML5Form.NumberFormField(element, form)
+			when 'range' 
+				return new HTML5Form.RangeFormField(element, form)
+			else
+				return new HTML5Form.TextFormField(element, form)
+
+
+
+$.fn.html5FormFieldValidator = () -> 
+	@each ()->
+		formFieldFactory(this, $(this).closest("form"))
+
+
 $.fn.html5FormValidator = () -> 
 	# Default settings
-		html5form = new HTML5Form()
-		formFieldFactory = (element, form) ->
-			if element.tagName.toUpperCase() is 'SELECT'
-				return new HTML5Form.SelectFormField(element, form)
-			else if element.tagName.toUpperCase() is 'TEXTAREA'
-				return new HTML5Form.TextAreaFormField(element, form)
-			else	
-				switch $(element).attr('type')
-					when 'email' 
-						return new HTML5Form.EmailFormField(element, form)
-					when 'tel' 
-						return new HTML5Form.TelFormField(element, form)
-					when 'url' 
-						return new HTML5Form.UrlFormField(element, form)
-					when 'checkbox' 
-						return new HTML5Form.CheckboxFormField(element, form) 
-					when 'date' 
-						return new HTML5Form.DateFormField(element, form)
-					when 'ui-date' 
-						return new HTML5Form.DateFormField(element, form)
-					when 'number' 
-						return new HTML5Form.NumberFormField(element, form)
-					when 'ui-number' 
-						return new HTML5Form.NumberFormField(element, form)
-					when 'range' 
-						return new HTML5Form.RangeFormField(element, form)
-					else
-						return new HTML5Form.TextFormField(element, form)
-		
+		html5form = new HTML5Form()		
 		@each ()->
 			$form = $(this);
 			form = this
@@ -222,9 +238,13 @@ $.fn.html5FormValidator = () ->
 				fields.push formFieldFactory( this, form )
 			checkInputFields = () =>
 				errors = []
-				for field in fields
-					if not field.validate()
-						errors.push(field.element)
+				$form.find('textarea.invalid, select.invalid, input:not(:submit,:button,:image).invalid, textarea.pristine, select.pristine, input:not(:submit,:button,:image).pristine').each () ->
+					if $(this).hasClass('pristine') 
+						if $(this).attr('required')
+							$(this).addClass('invalid') 
+							errors.push(this)
+					else
+						errors.push(this)
 				errors
 			# on submit, validate all the fields
 			for input in $form.find('input:submit, input:image, input:button')
